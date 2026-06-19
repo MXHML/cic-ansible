@@ -1,7 +1,7 @@
 - name: Gather more detailed info about hosts
   hosts: all
   tasks:
-    - name: Gather more detailed info with builtin.setup
+    - name: Gather info with builtin.setup
       ansible.builtin.setup:
         gather_subset: all
         gather_timeout: 10
@@ -22,7 +22,6 @@
           - "'1.1.1.1' in ansible_facts.dns.nameservers"
         fail_msg: "DNS may be misconfigured!"
         success_msg: "DNS configured properly!"
-
 
     - name: DEBUG:Dump all facts gathered
       ansible.builtin.debug:
