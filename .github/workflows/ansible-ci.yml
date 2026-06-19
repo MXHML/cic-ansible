@@ -2,9 +2,12 @@ name: Ansible CI/CD workflow
 
 on:
   push:
-    branches: [main]
+    branches:
+      - 'main'
+      - 'feat/*'
   pull_request:
-    branches: [main]
+    branches: 
+      - 'main'
 
 jobs:
   build:
