@@ -41,29 +41,5 @@
       ansible.builtin.group_by:
         key: arc_{{ ansible_facts.architecture }}
 
-- name: Debian-specific tasks
-  hosts: os_debian
-  tasks:
-    - name: Install necessary packages
-      become: true
-      ansible.builtin.apt:
-        pkg:
-          - sudo
-          - curl
-          - qemu-guest-agent
-          - git
-        update_cache: true
-        install_recommends: true
-      register: result
-
-    - name: Packages changed (if any)
-      ansible.builtin.debug:
-        var: result
-      when: result.changed == true
-
-    - name: Clean up apt packages
-      become: true
-      ansible.builtin.apt:
-        clean: true
-        autoremove: true
-        autoclean: true
+- name: Import 002-updates playbook
+  ansible.builtin.import_playbook: 002-updates.yaml
