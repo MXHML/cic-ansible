@@ -18,7 +18,7 @@
 
     - name: Check DNS configuration
       ansible.builtin.assert:
-        that: 
+        that:
           - "'1.1.1.1' in ansible_facts.dns.nameservers"
         fail_msg: "DNS may be misconfigured!"
         success_msg: "DNS configured properly!"
@@ -31,6 +31,7 @@
 
 - name: Group targets based on facts
   hosts: all
+  gather_facts: false # Don't re-gather facts if we already have them
   tasks:
     - name: Group based on OS distribution
       ansible.builtin.group_by:
@@ -43,26 +44,26 @@
 - name: Debian-specific tasks
   hosts: os_debian
   tasks:
-      - name: Install necessary packages
-        become: yes
-        ansible.builtin.apt:
-          pkg:
-            - sudo
-            - curl
-            - qemu-guest-agent
-            - git
-          update_cache: yes
-          install_recommends: yes
-        register: result
+    - name: Install necessary packages
+      become: true
+      ansible.builtin.apt:
+        pkg:
+          - sudo
+          - curl
+          - qemu-guest-agent
+          - git
+        update_cache: true
+        install_recommends: true
+      register: result
 
-      - name: Packages changed (if any)
-        ansible.builtin.debug:
-          var: result
-        when: result.changed == true
+    - name: Packages changed (if any)
+      ansible.builtin.debug:
+        var: result
+      when: result.changed == true
 
-      - name: Clean up apt packages
-        become: yes
-        ansible.builtin.apt:
-          clean: yes
-          autoremove: yes
-          autoclean: yes
+    - name: Clean up apt packages
+      become: true
+      ansible.builtin.apt:
+        clean: true
+        autoremove: true
+        autoclean: true
