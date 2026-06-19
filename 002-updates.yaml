@@ -1,0 +1,28 @@
+#Patching and updates; ensures things like security updates are enabled,
+#packages are up to date, unattended-upgrades, etc.
+
+- name: A1. Patching and Updates
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install python-apt for package facts 
+      ansible.builtin.apt:
+        pkg:
+          - python-apt
+        update_cache: yes
+
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+    
+    - name: Verify unattended-upgrades and apt-listchanges are installed
+      ansible.builtin.apt:
+        pkg:
+          - unattended-upgrades
+          - apt-listchanges
+        when: unattended-upgrades not in ansible_facts.packages or apt-listchanges not in ansible_facts.packages
+    
+    - name: Enable security origin in 50unattended-upgrades
+
+    
+        

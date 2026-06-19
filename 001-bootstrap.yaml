@@ -1,0 +1,68 @@
+- name: Gather more detailed info about hosts
+  hosts: all
+  tasks:
+    - name: Gather more detailed info with builtin.setup
+      ansible.builtin.setup:
+        gather_subset: all
+        gather_timeout: 10
+        fact_path: /srv/ansible/facts.d
+
+    - name: Dump specific facts of interest
+      ansible.builtin.debug:
+        msg:
+          - "Distribution: {{ ansible_facts.distribution }} {{ ansible_facts.lsb.codename }} ({{ ansible_facts.lsb.major_release }})"
+          - "Kernel: {{ ansible_facts.kernel }}"
+          - "Network"
+          - " Local IPv4: {{ ansible_facts.default_ipv4.address }}/{{ ansible_facts.default_ipv4.prefix }}"
+          - " DNS Nameservers: {{ ansible_facts.dns.nameservers }}"
+
+    - name: Check DNS configuration
+      ansible.builtin.assert:
+        that: 
+          - "'1.1.1.1' in ansible_facts.dns.nameservers"
+        fail_msg: "DNS may be misconfigured!"
+        success_msg: "DNS configured properly!"
+
+
+    - name: DEBUG:Dump all facts gathered
+      ansible.builtin.debug:
+        var: ansible_facts
+        verbosity: 4
+
+- name: Group targets based on facts
+  hosts: all
+  tasks:
+    - name: Group based on OS distribution
+      ansible.builtin.group_by:
+        key: os_{{ ansible_facts.distribution | lower }}
+
+    - name: Group targets by architecture
+      ansible.builtin.group_by:
+        key: arc_{{ ansible_facts.architecture }}
+
+- name: Debian-specific tasks
+  hosts: os_debian
+  tasks:
+      - name: Install necessary packages
+        become: yes
+        ansible.builtin.apt:
+          pkg:
+            - sudo
+            - curl
+            - qemu-guest-agent
+            - git
+          update_cache: yes
+          install_recommends: yes
+        register: result
+
+      - name: Packages changed (if any)
+        ansible.builtin.debug:
+          var: result
+        when: result.changed == true
+
+      - name: Clean up apt packages
+        become: yes
+        ansible.builtin.apt:
+          clean: yes
+          autoremove: yes
+          autoclean: yes
