@@ -1,0 +1,23 @@
+name: Ansible CI/CD workflow
+
+on:
+  push:
+    branches:
+      - "main"
+      - "feat/*"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@main
+        with:
+          args: ""
+          setup_python: "true"
+          python_version: "3.14"
