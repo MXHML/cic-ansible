@@ -25,7 +25,7 @@
           - apt-listchanges
       when: "'unattended-upgrades' not in ansible_facts.packages or 'apt-listchanges' not in ansible_facts.packages"
 
-    - name: Enable periodic apt and unattended-upgrades
+    - name: Enable unattended upgrades and periodic cache updates
       ansible.builtin.copy:
         dest: /etc/apt/apt.conf.d/20auto-upgrades
         content: |
@@ -34,7 +34,7 @@
         owner: root
         group: root
         mode: "0644"
-      register: out1
+      register: common_002_update20autoupgrades
 
     - name: Enable automatic reboot in 50unattended-upgrades
       ansible.builtin.lineinfile:
@@ -52,6 +52,6 @@
       ansible.builtin.systemd_service:
         state: started
         name: apt-daily-upgrade.timer
-      register: out3
+      register: common_002_aptdailytimer
       check_mode: true
-      failed_when: out3.changed
+      failed_when: common_002_aptdailytimer.changed
