@@ -1,0 +1,13 @@
+# Specific tasks for systems using apt(1) package manager
+# Typically, these are debian-based systems, but main.yaml directly checks
+# what package manager is in use, instead of going by distro.
+- name: (apt-managed systems) Enable unattended upgrades and periodic cache updates
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    owner: root
+    group: root
+    mode: "0644"
+  register: updates_20autoupgrades

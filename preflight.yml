@@ -1,0 +1,13 @@
+- name: Preflight host configuration
+  hosts: all
+  gather_facts: false
+  pre_tasks:
+    - name: "Unlock SSH key for class {{ vm_registry.class }}"
+      ansible.builtin.expect:
+        command: ssh-add "{{ ansible_private_key_file }}"
+        responses:
+          passphrase: "{{ ansible_private_key_passphrase }}"
+      delegate_to: 127.0.0.1
+      become: false
+      changed_when: false
+      no_log: true
